@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 82834665}
   - component: {fileID: 82834664}
   - component: {fileID: 82834666}
+  - component: {fileID: 82834667}
   m_Layer: 0
   m_Name: $Main_Character_1_1
   m_TagString: Untagged
@@ -222,6 +223,27 @@ MonoBehaviour:
   speed: 2.4
   runSpeed: 2.4
   walkCount: 20
+--- !u!95 &82834667
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82834663}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7f9eca4bb72aa464aaf56f18ae819bbb, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
