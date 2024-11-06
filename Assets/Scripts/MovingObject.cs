@@ -27,51 +27,73 @@ public class MovingObject : MonoBehaviour
     // 코루틴 동시 입력을 방지하기 위해 사용할 플래그
     private bool canMove = true;
 
+    // 애니메이션 객체 생성
+    private Animator animator;
+
     void Start()
     {
-
+        // Animator 컴포넌트를 가져와 animator 변수에 할당
+        animator = GetComponent<Animator>();
     }
 
     // 원하는 만큼 움직일 수 있게 대기 시간을 주는 코루틴
     IEnumerator MoveCoroutine()
     {
-        // shift 키를 누르면 달리기 속도 적용
-        if (Input.GetKey(KeyCode.LeftShift))
+        // 코루틴은 한번만 실행되고 내부에서 실행된다.
+        while (Input.GetAxisRaw("Vertical") != 0 || Input.GetAxisRaw("Horizontal") != 0)
         {
-            applyRunSpeed = runSpeed;
-            applyRunFlag = true;
-        }
-        else
-        {
-            applyRunSpeed = 0;
-            applyRunFlag = false;
-        }
+            // shift 키를 누르면 달리기 속도 적용
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                applyRunSpeed = runSpeed;
+                applyRunFlag = true;
+            }
+            else
+            {
+                applyRunSpeed = 0;
+                applyRunFlag = false;
+            }
 
-        // z값은 바뀌지 않기 때문에 z로만 해도 문제 없다
-        vector.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), transform.position.z);
+            // z값은 바뀌지 않기 때문에 z로만 해도 문제 없다
+            vector.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), transform.position.z);
 
-        while (currentWalkCount < walkCount)
-        {
-            // 좌우 방향키 입력 시 상하 이동을 막기 위해 상하 이동값을 0으로 설정
+            // vector x의 값이 0이 아니면 y값을 0으로 설정
             if (vector.x != 0)
-            {
-                // Translate : 현재 위치에서 인자로 받은 값만큼 이동
-                transform.Translate(vector.x * (speed + applyRunSpeed), 0, 0);
-            }
-            // 상하 방향키 입력 시 좌우 이동을 막기 위해 좌우 이동값을 0으로 설정
-            else if (vector.y != 0)
-            {
-                transform.Translate(0, vector.y * (speed + applyRunSpeed), 0);
-            }
+                vector.y = 0;
 
-            // Shift 눌림 버튼이 활성화 되면 달리기 적용
-            if (applyRunFlag)
-                currentWalkCount++;
+            // DirX의 파라미터 값을 vector.x, vector.y로 설정
+            animator.SetFloat("DirX", vector.x);
+            animator.SetFloat("DirY", vector.y);
+        
+            // Stading Tree -> Walking Tree로 상태 변경
+            animator.SetBool("Walking", true);
+
+            while (currentWalkCount < walkCount)
+            {
+                // 좌우 방향키 입력 시 상하 이동을 막기 위해 상하 이동값을 0으로 설정
+                if (vector.x != 0)
+                {
+                    // Translate : 현재 위치에서 인자로 받은 값만큼 이동
+                    transform.Translate(vector.x * (speed + applyRunSpeed), 0, 0);
+                }
+                // 상하 방향키 입력 시 좌우 이동을 막기 위해 좌우 이동값을 0으로 설정
+                else if (vector.y != 0)
+                {
+                    transform.Translate(0, vector.y * (speed + applyRunSpeed), 0);
+                }
+
+                // Shift 눌림 버튼이 활성화 되면 달리기 적용
+                if (applyRunFlag)
+                    currentWalkCount++;
           
-            currentWalkCount++;
-            yield return new WaitForSeconds(0.01f);
+                currentWalkCount++;
+                yield return new WaitForSeconds(0.01f);
+            }
+            currentWalkCount = 0;
         }
-        currentWalkCount = 0;
+
+        // Walking Tree -> Stading Tree로 상태 변경
+        animator.SetBool("Walking", false);
         canMove = true;
     }
 
