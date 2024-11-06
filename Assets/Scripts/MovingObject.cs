@@ -5,6 +5,13 @@ using UnityEngine;
 
 public class MovingObject : MonoBehaviour
 {
+    // 박스콜라이더 객체 생성 - 충돌범위 지정 위함
+    private BoxCollider2D boxCollider;
+
+    // 레이어 마스크를 사용하여 어떤 레이어와 충돌할지 결정
+    // 즉, 통과가 불가능한 레이어 설정
+    public LayerMask layerMask;
+
     // 캐릭터의 이동 속도
     public float speed;
 
@@ -32,6 +39,9 @@ public class MovingObject : MonoBehaviour
 
     void Start()
     {
+        // BoxCollider2D 컴포넌트를 가져와 boxCollider 변수에 할당
+        boxCollider = GetComponent<BoxCollider2D>();
+
         // Animator 컴포넌트를 가져와 animator 변수에 할당
         animator = GetComponent<Animator>();
     }
@@ -64,7 +74,27 @@ public class MovingObject : MonoBehaviour
             // DirX의 파라미터 값을 vector.x, vector.y로 설정
             animator.SetFloat("DirX", vector.x);
             animator.SetFloat("DirY", vector.y);
-        
+
+            // Raycast : 레이저를 쏘아 맞은 물체의 정보를 가져옴
+            // Raycast(시작점, 방향, 거리, 레이어마스크)
+            RaycastHit2D hit;
+            
+            // A지점, 캐릭터의 현재 위치
+            Vector2 start = transform.position;  
+            // B지점, 캐릭터가 이동할 위치
+            Vector2 end = start + new Vector2(vector.x * speed * walkCount, vector.y * speed * walkCount);
+
+            // A지점, B지점
+            // hit = Null <- A지점에 도달하였을 때
+            // hit = 방해물 <- 방해물에 부딪혔을 때 방해물의 위치 리턴
+            boxCollider.enabled = false; // 이동할 때 플레이어의 boxColider를 꺼주어야 자기 자신한테 충돌 발생 x
+            hit = Physics2D.Linecast(start, end, layerMask);
+            boxCollider.enabled = true; // 다시 켜준다
+
+            // 방해물에 부딪혔을 때 걷는 모션을 제거
+            if (hit.transform != null)
+                break;
+
             // Stading Tree -> Walking Tree로 상태 변경
             animator.SetBool("Walking", true);
 
